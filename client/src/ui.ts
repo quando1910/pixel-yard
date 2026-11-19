@@ -1,5 +1,5 @@
 // DOM overlay: name popup, HUD, name labels, tooltip, countdown.
-import { NAME_MAX, validName } from "@race/shared";
+import { NAME_MAX, validName } from "@pixelyard/shared";
 import { character, GENDERS, SHIRT_COLORS } from "./art";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;

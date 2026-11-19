@@ -3,7 +3,7 @@ import {
   C, CONES, FINISH_S, JUMP_TICKS, GATE_S, GATE_X, HALF_W, KART_ACCEL, DT, K_STRIDE, LANES, P_STRIDE, SPAWN, START_Y,
   RAMPS, STEP_MS, WORLD_H, WORLD_W, World, project, rampSeed, setRamps,
   type Phase, type SnapshotMsg,
-} from "@race/shared";
+} from "@pixelyard/shared";
 import { buildTextures, RAMP_ORIGIN_X, KART_BACK, KART_FRONT, KART_SEAT, KART_SIDE, SHIRT_COLORS, VIEW_BACK, VIEW_FRONT, VIEW_SIDE } from "./art";
 import { audio } from "./audio";
 import { readDirection, setActionHandler } from "./input";

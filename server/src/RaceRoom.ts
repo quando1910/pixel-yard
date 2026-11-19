@@ -3,7 +3,7 @@ import {
   C, S, FINISH_S, GATE_X, KART_R, MAX_PLAYERS, SPAWN, STEP_MS, TICK_RATE, WALK_R, World,
   project, setRamps, validName,
   type InitMsg, type Phase, type Player, type RaceMsg, type RosterMsg, type SnapshotMsg,
-} from "@race/shared";
+} from "@pixelyard/shared";
 
 const COUNTDOWN_TICKS = 3 * TICK_RATE;
 const FINISHED_TICKS = 8 * TICK_RATE;

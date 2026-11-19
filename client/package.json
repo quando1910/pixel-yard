@@ -1,5 +1,5 @@
 {
-  "name": "@race/client",
+  "name": "@pixelyard/client",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,7 +8,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@race/shared": "*",
+    "@pixelyard/shared": "*",
     "colyseus.js": "^0.16.0",
     "phaser": "^3.90.0"
   },

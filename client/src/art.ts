@@ -2,7 +2,7 @@
 import {
   CENTER, FINISH_S, GATE_X, HALF_W, KART_COUNT, LANE_W, START_Y, TRACK_W, WORLD_H, WORLD_W,
   GATE_S, RAMP_LEN, homeSlot, pointAt, project, seededRandom,
-} from "@race/shared";
+} from "@pixelyard/shared";
 
 export const KART_COLORS = [
   "#e5484d", "#f08a24", "#f2c230", "#8fce3a", "#2fae66",
@@ -13,6 +13,9 @@ export const SHIRT_COLORS = [
 ];
 
 type Ctx = CanvasRenderingContext2D;
+
+/** Font for lettering painted on the track; main.ts waits for it to load before textures are built. */
+export const TRACK_FONT = "Orbitron, monospace";
 
 function canvas(w: number, h: number, draw: (c: Ctx) => void): HTMLCanvasElement {
   const el = document.createElement("canvas");
@@ -262,10 +265,10 @@ function track(): HTMLCanvasElement {
     c.stroke();
     c.restore();
     c.fillStyle = "rgba(255,255,255,0.3)";
-    c.font = "bold 20px monospace";
+    c.font = `bold 20px ${TRACK_FONT}`;
     c.textAlign = "center";
     c.fillText("PADDOCK", 400, START_Y - 70);
-    c.font = "bold 12px monospace";
+    c.font = `bold 11px ${TRACK_FONT}`;
     c.fillText("pick a kart  >>>", 560, START_Y + 6);
 
     // Starting grid boxes.
@@ -284,7 +287,7 @@ function track(): HTMLCanvasElement {
     // The finish straight runs east or west; put the label on the side the karts come from.
     checker(c, f.dx > 0 ? f.x : f.x - 22, f.y - HALF_W, 2, 20, 11);
     c.fillStyle = "rgba(255,255,255,0.75)";
-    c.font = "bold 22px monospace";
+    c.font = `bold 20px ${TRACK_FONT}`;
     c.fillText("FINISH", f.x - f.dx * 54, f.y + 8);
 
     // Direction chevrons.

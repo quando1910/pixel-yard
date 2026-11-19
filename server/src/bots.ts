@@ -4,7 +4,7 @@ import { Client } from "colyseus.js";
 import {
   C, S, P_STRIDE, K_STRIDE, ROOM_NAME, SERVER_PORT, STEP_MS, homeSlot, pointAt, project,
   type InitMsg, type RaceMsg, type SnapshotMsg,
-} from "@race/shared";
+} from "@pixelyard/shared";
 
 const count = Number(process.argv[2]) || 3;
 const url = process.argv[3] || `ws://localhost:${SERVER_PORT}`;

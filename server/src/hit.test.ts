@@ -1,5 +1,5 @@
 // Quick check of kart-versus-walker physics: npx tsx server/src/hit.test.ts
-import { World } from "@race/shared";
+import { World } from "@pixelyard/shared";
 
 const w = new World();
 w.gateOpen = true;
@@ -21,7 +21,7 @@ console.log("OK");
 
 // Jump ramp: a kart driving onto the first ramp takes off, flies faster than top speed, then lands.
 {
-  const { RAMPS, JUMP_SPEED, KART_MAX } = await import("@race/shared");
+  const { RAMPS, JUMP_SPEED, KART_MAX } = await import("@pixelyard/shared");
   const w2 = new World();
   w2.gateOpen = true;
   const r = RAMPS[0];
@@ -40,7 +40,7 @@ console.log("OK");
 // Trap ramp: jumping it lands in a wall of cones, so the kart ends up behind a kart that just drove.
 {
   // RAMPS and CONES are replaced by setRamps(), so read them from the module each time.
-  const shared = await import("@race/shared");
+  const shared = await import("@pixelyard/shared");
   const { KART_MAX, setRamps } = shared;
   type R = (typeof shared.RAMPS)[0];
   for (const seed of [1, 2, 3]) {
@@ -66,7 +66,7 @@ console.log("OK");
 
 // Walled-in ramp near the finish: driving straight at it never gets a kart into the air.
 {
-  const shared = await import("@race/shared");
+  const shared = await import("@pixelyard/shared");
   for (const seed of [1, 2, 3]) {
     shared.setRamps(seed);
     const r = shared.RAMPS[shared.blockedRamp];

@@ -1,5 +1,5 @@
 {
-  "name": "@race/server",
+  "name": "@pixelyard/server",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@colyseus/ws-transport": "^0.16.0",
-    "@race/shared": "*",
+    "@pixelyard/shared": "*",
     "colyseus": "^0.16.0",
     "express": "^4.21.0",
     "tsx": "^4.19.0"

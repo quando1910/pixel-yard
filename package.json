@@ -1,5 +1,5 @@
 {
-  "name": "lego-race",
+  "name": "pixelyard",
   "private": true,
   "workspaces": ["shared", "server", "client"],
   "scripts": {

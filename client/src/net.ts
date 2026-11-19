@@ -2,7 +2,7 @@ import { Client, type Room } from "colyseus.js";
 import {
   ROOM_NAME, S, SERVER_PORT,
   type InitMsg, type Phase, type RaceMsg, type RosterMsg, type SnapshotMsg,
-} from "@race/shared";
+} from "@pixelyard/shared";
 
 export interface RaceState {
   ph: Phase;

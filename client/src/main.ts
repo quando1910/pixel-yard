@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { C, validName } from "@race/shared";
+import { C, validName } from "@pixelyard/shared";
 import { audio } from "./audio";
 import { connect } from "./net";
 import { GameScene } from "./scene";
@@ -33,6 +33,13 @@ async function boot(): Promise<void> {
     ui.showStatus("Cannot reach the race server. Reload the page to try again.");
     return;
   }
+
+  // Lettering on the track is painted once onto a canvas, so the web font has to be ready first.
+  // If it cannot load (offline, blocked), carry on with the fallback font.
+  await Promise.race([
+    document.fonts.load("bold 20px Orbitron").catch(() => {}),
+    new Promise((resolve) => setTimeout(resolve, 2500)),
+  ]);
 
   const room = net.room;
   ui.showHud(net.isAdmin, () => room.send(C.start), () => room.send(C.end));

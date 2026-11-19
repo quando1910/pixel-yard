@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import { Server } from "colyseus";
 import { WebSocketTransport } from "@colyseus/ws-transport";
-import { ROOM_NAME, SERVER_PORT } from "@race/shared";
+import { ROOM_NAME, SERVER_PORT } from "@pixelyard/shared";
 import { RaceRoom } from "./RaceRoom";
 
 const app = express();
