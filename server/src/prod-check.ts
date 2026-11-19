@@ -22,8 +22,8 @@ const right = await join({ adminKey: key }); rooms.push(right.room);
 check(right.init.admin === true, "correct admin key is accepted");
 const wrong = await join({ adminKey: key + "x" }); rooms.push(wrong.room);
 check(wrong.init.admin === false, "wrong admin key is refused");
-const legacy = await join({ admin: true }); rooms.push(legacy.room);
-check(legacy.init.admin === false, "old isAdmin flag is ignored when ADMIN_KEY is set");
+const none = await join({ admin: true }); rooms.push(none.room);
+check(none.init.admin === false, "joining without a key is never admin");
 
 while (rooms.length < MAX_PLAYERS) rooms.push((await join({})).room);
 try {

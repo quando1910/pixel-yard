@@ -7,10 +7,8 @@ import * as ui from "./ui";
 
 const NAME_KEY = "playerName";
 const GENDER_KEY = "playerGender";
-/** Admin key for this browser, set by hand: localStorage.setItem("adminKey", "<key>"). */
+/** Admin key for this browser, set by hand: localStorage.setItem("adminKey", "<key>"). The local dev server accepts "dev". */
 const ADMIN_KEY = "adminKey";
-/** Old flag, honoured only by a local development server without ADMIN_KEY. */
-const LEGACY_ADMIN = "isAdmin";
 
 async function boot(): Promise<void> {
   ui.onMute(() => audio.toggleMute(), audio.muted);
@@ -26,7 +24,7 @@ async function boot(): Promise<void> {
 
   let net;
   try {
-    net = await connect(name, gender, localStorage.getItem(ADMIN_KEY), localStorage.getItem(LEGACY_ADMIN) === "1", () => {
+    net = await connect(name, gender, localStorage.getItem(ADMIN_KEY), () => {
       // Connection lost: the name is still in session storage, so a reload rejoins.
       ui.showStatus("Disconnected. Reconnecting…");
       setTimeout(() => location.reload(), 2000);

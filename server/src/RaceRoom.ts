@@ -23,13 +23,13 @@ interface Info {
 }
 
 // Admin: a player is admin when the adminKey they send matches ADMIN_KEY.
-// Without ADMIN_KEY, local development still accepts the browser's isAdmin flag; production has no admin.
-const ADMIN_KEY = process.env.ADMIN_KEY || "";
-const DEV = process.env.NODE_ENV !== "production";
+// Local development without ADMIN_KEY uses DEV_ADMIN_KEY; production without ADMIN_KEY has no admin.
+export const DEV_ADMIN_KEY = "dev";
+const ADMIN_KEY = process.env.ADMIN_KEY || (process.env.NODE_ENV === "production" ? "" : DEV_ADMIN_KEY);
 const digest = (s: string) => createHash("sha256").update(s).digest();
-function isAdmin(options: { admin?: unknown; adminKey?: unknown }): boolean {
-  if (ADMIN_KEY) return typeof options?.adminKey === "string" && timingSafeEqual(digest(options.adminKey), digest(ADMIN_KEY));
-  return DEV && options?.admin === true;
+function isAdmin(options: { adminKey?: unknown }): boolean {
+  return ADMIN_KEY !== "" && typeof options?.adminKey === "string"
+    && timingSafeEqual(digest(options.adminKey), digest(ADMIN_KEY));
 }
 
 const r2 = (v: number) => Math.round(v * 100) / 100;
@@ -89,7 +89,7 @@ export class RaceRoom extends Room {
     if (this.counted) RaceRoom.openRooms--;
   }
 
-  onJoin(client: Client, options: { name?: unknown; gender?: unknown; admin?: unknown; adminKey?: unknown }): void {
+  onJoin(client: Client, options: { name?: unknown; gender?: unknown; adminKey?: unknown }): void {
     const name = validName(options?.name);
     if (!name) throw new Error("Invalid name");
     const pid = this.nextPid++;

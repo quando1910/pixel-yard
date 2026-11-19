@@ -29,17 +29,15 @@ export interface Net {
   race: RaceState;
 }
 
-/** adminKey: the admin key saved in this browser, if any; legacyAdmin: the old isAdmin flag (local development only). */
-export async function connect(
-  name: string, gender: number, adminKey: string | null, legacyAdmin: boolean, onClosed: () => void,
-): Promise<Net> {
+/** adminKey: the admin key saved in this browser, if any. */
+export async function connect(name: string, gender: number, adminKey: string | null, onClosed: () => void): Promise<Net> {
   // VITE_SERVER_URL is set at build time when the client is hosted apart from the server (e.g. wss://api.example.com).
   // Otherwise: the local dev server in development, the page's own host in production.
   const url = (import.meta.env.VITE_SERVER_URL as string | undefined)
     || (import.meta.env.DEV
       ? `ws://${location.hostname}:${SERVER_PORT}`
       : `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}`);
-  const room = await new Client(url).joinOrCreate(ROOM_NAME, { name, gender, adminKey, admin: legacyAdmin });
+  const room = await new Client(url).joinOrCreate(ROOM_NAME, { name, gender, adminKey });
   const net: Net = {
     room,
     pid: -1,

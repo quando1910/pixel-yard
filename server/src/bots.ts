@@ -1,6 +1,6 @@
 // Smoke test and load test: bots join, take a kart, race to the finish.
 // Usage: npx tsx server/src/bots.ts [count] [url]
-// Bot 1 acts as admin; against a server with ADMIN_KEY set, pass the same ADMIN_KEY in the environment.
+// Bot 1 acts as admin with ADMIN_KEY from the environment, or the local dev key "dev".
 import { Client } from "colyseus.js";
 import {
   C, S, P_STRIDE, K_STRIDE, ROOM_NAME, SERVER_PORT, STEP_MS, homeSlot, pointAt, project,
@@ -15,7 +15,7 @@ let mounted = 0;
 let racesSeen = 0;
 
 async function bot(i: number): Promise<void> {
-  const room = await new Client(url).joinOrCreate(ROOM_NAME, { name: `Bot ${i + 1}`, gender: i % 2, admin: i === 0, adminKey: i === 0 ? process.env.ADMIN_KEY : undefined });
+  const room = await new Client(url).joinOrCreate(ROOM_NAME, { name: `Bot ${i + 1}`, gender: i % 2, adminKey: i === 0 ? process.env.ADMIN_KEY || "dev" : undefined });
   let pid = -1, seq = 0, phase = "waiting", asked = false, started = false;
   let me = { x: 0, y: 0, kart: -1 };
   let lastS = 0, sinceCheck = 0, reverse = 0, lane = 0;
