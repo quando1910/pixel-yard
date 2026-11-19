@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { C, validName } from "@pixelyard/shared";
+import { C, ROOM_FULL, validName } from "@pixelyard/shared";
 import { audio } from "./audio";
 import { connect } from "./net";
 import { GameScene } from "./scene";
@@ -7,7 +7,8 @@ import * as ui from "./ui";
 
 const NAME_KEY = "playerName";
 const GENDER_KEY = "playerGender";
-const ADMIN_KEY = "isAdmin";
+/** Admin key for this browser, set by hand: localStorage.setItem("adminKey", "<key>"). The local dev server accepts "dev". */
+const ADMIN_KEY = "adminKey";
 
 async function boot(): Promise<void> {
   ui.onMute(() => audio.toggleMute(), audio.muted);
@@ -23,14 +24,17 @@ async function boot(): Promise<void> {
 
   let net;
   try {
-    net = await connect(name, gender, localStorage.getItem(ADMIN_KEY) === "1", () => {
+    net = await connect(name, gender, localStorage.getItem(ADMIN_KEY), () => {
       // Connection lost: the name is still in session storage, so a reload rejoins.
       ui.showStatus("Disconnected. Reconnecting…");
       setTimeout(() => location.reload(), 2000);
     });
   } catch (err) {
     console.error(err);
-    ui.showStatus("Cannot reach the race server. Reload the page to try again.");
+    const full = String((err as { message?: unknown })?.message ?? err).includes(ROOM_FULL);
+    ui.showStatus(full
+      ? "Pixelyard is full right now. Reload the page in a little while."
+      : "Cannot reach the race server. Reload the page to try again.");
     return;
   }
 

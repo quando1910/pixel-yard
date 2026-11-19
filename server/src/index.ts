@@ -36,4 +36,6 @@ const gameServer = new Server({ transport: new WebSocketTransport({ server: http
 gameServer.define(ROOM_NAME, RaceRoom);
 
 const port = Number(process.env.PORT) || SERVER_PORT;
-gameServer.listen(port).then(() => console.log(`Pixelyard server ${version} listening on :${port}`));
+// HOST=127.0.0.1 in production so only the local Cloudflare Tunnel can reach the server; unset listens everywhere.
+const host = process.env.HOST || undefined;
+gameServer.listen(port, host).then(() => console.log(`Pixelyard server ${version} listening on ${host ?? "*"}:${port}`));
