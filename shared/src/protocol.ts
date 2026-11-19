@@ -28,7 +28,12 @@ export const S = {
 
 export interface InitMsg {
   pid: number;
+  /** Whether the server accepted this player as admin (see ADMIN_KEY on the server). */
+  admin: boolean;
 }
+
+/** Error message when the single room is full. */
+export const ROOM_FULL = "room_full";
 
 /**
  * World snapshot, flat arrays to keep it small.

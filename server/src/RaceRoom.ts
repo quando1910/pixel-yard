@@ -1,7 +1,8 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { Room, type Client } from "colyseus";
 import {
   C, S, FINISH_S, GATE_X, KART_R, MAX_PLAYERS, SPAWN, STEP_MS, TICK_RATE, WALK_R, World,
-  project, setRamps, validName,
+  ROOM_FULL, project, setRamps, validName,
   type InitMsg, type Phase, type Player, type RaceMsg, type RosterMsg, type SnapshotMsg,
 } from "@pixelyard/shared";
 
@@ -21,11 +22,24 @@ interface Info {
   seq: number;
 }
 
+// Admin: a player is admin when the adminKey they send matches ADMIN_KEY.
+// Without ADMIN_KEY, local development still accepts the browser's isAdmin flag; production has no admin.
+const ADMIN_KEY = process.env.ADMIN_KEY || "";
+const DEV = process.env.NODE_ENV !== "production";
+const digest = (s: string) => createHash("sha256").update(s).digest();
+function isAdmin(options: { admin?: unknown; adminKey?: unknown }): boolean {
+  if (ADMIN_KEY) return typeof options?.adminKey === "string" && timingSafeEqual(digest(options.adminKey), digest(ADMIN_KEY));
+  return DEV && options?.admin === true;
+}
+
 const r2 = (v: number) => Math.round(v * 100) / 100;
 const dir = (v: unknown) => (v === 1 || v === -1 ? v : 0);
 
 export class RaceRoom extends Room {
   maxClients = MAX_PLAYERS;
+  /** Pixelyard runs a single room: once it is full, newcomers are turned away instead of getting a room of their own. */
+  private static openRooms = 0;
+  private counted = false;
 
   private world = new World();
   private infos = new Map<string, Info>();
@@ -48,6 +62,9 @@ export class RaceRoom extends Room {
   }
 
   onCreate(): void {
+    if (RaceRoom.openRooms >= 1) throw new Error(ROOM_FULL);
+    RaceRoom.openRooms++;
+    this.counted = true;
     this.shuffleRamps();
     this.onMessage(C.input, (client, msg) => {
       const info = this.infos.get(client.sessionId);
@@ -68,16 +85,21 @@ export class RaceRoom extends Room {
     this.setSimulationInterval((dt) => this.loop(dt), STEP_MS);
   }
 
-  onJoin(client: Client, options: { name?: unknown; gender?: unknown; admin?: unknown }): void {
+  onDispose(): void {
+    if (this.counted) RaceRoom.openRooms--;
+  }
+
+  onJoin(client: Client, options: { name?: unknown; gender?: unknown; admin?: unknown; adminKey?: unknown }): void {
     const name = validName(options?.name);
     if (!name) throw new Error("Invalid name");
     const pid = this.nextPid++;
     const gender = options?.gender === 1 ? 1 : 0;
-    this.infos.set(client.sessionId, { pid, name, gender, admin: options?.admin === true, queue: [], seq: 0 });
+    const admin = isAdmin(options);
+    this.infos.set(client.sessionId, { pid, name, gender, admin, queue: [], seq: 0 });
     const player: Player = { id: pid, x: 0, y: 0, vx: 0, vy: 0, ix: 0, iy: 0, kart: -1 };
     this.placeAtSpawn(player);
     this.world.players.set(pid, player);
-    client.send(S.init, { pid } satisfies InitMsg);
+    client.send(S.init, { pid, admin } satisfies InitMsg);
     client.send(S.race, this.raceMsg());
     this.broadcast(S.roster, this.rosterMsg());
   }

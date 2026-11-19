@@ -6,10 +6,15 @@
 # It creates:
 #   - user `pixelyard`, which GitHub Actions logs in as and which runs the server
 #   - /opt/pixelyard/releases (one folder per release) and /opt/pixelyard/current (symlink to the live one)
-#   - /etc/pixelyard.env for server settings (PORT, CLIENT_ORIGIN); kept if it already exists
+#   - /etc/pixelyard.env for server settings (PORT, HOST, CLIENT_ORIGIN, ADMIN_KEY); kept if it already exists
 #   - systemd service `pixelyard`, started by the first deploy
 #   - optionally cloudflared, running the tunnel whose token you pass
 set -euo pipefail
+
+if [ "$(id -u)" -ne 0 ]; then
+  echo "Run this as root: sudo bash $0 ..." >&2
+  exit 1
+fi
 
 PUBKEY="${1:?usage: sudo bash setup-vm.sh \"<ssh public key>\" [tunnel token]}"
 TUNNEL_TOKEN="${2:-}"
@@ -17,7 +22,7 @@ APP_USER=pixelyard
 BASE=/opt/pixelyard
 
 apt-get update -q
-apt-get install -y -q curl rsync sudo ca-certificates gnupg
+apt-get install -y -q curl rsync sudo openssl ca-certificates gnupg
 
 # Node.js 22
 if ! command -v node >/dev/null || ! node -v | grep -q '^v22\.'; then
@@ -43,9 +48,15 @@ visudo -cf /etc/sudoers.d/pixelyard
 if [ ! -f /etc/pixelyard.env ]; then
   cat > /etc/pixelyard.env <<'CONF'
 PORT=2567
+# Listen on localhost only: players reach the server through the Cloudflare Tunnel.
+HOST=127.0.0.1
 # Only this website may use the matchmaker (comma-separated). Unset allows any origin.
 # CLIENT_ORIGIN=https://play.example.com
 CONF
+fi
+# Admin key: generated once. Admins save it in their browser: localStorage.setItem("adminKey", "<key>")
+if ! grep -q '^ADMIN_KEY=' /etc/pixelyard.env; then
+  echo "ADMIN_KEY=$(openssl rand -hex 24)" >> /etc/pixelyard.env
 fi
 chown root:"$APP_USER" /etc/pixelyard.env
 chmod 640 /etc/pixelyard.env
@@ -90,3 +101,4 @@ if [ -n "$TUNNEL_TOKEN" ]; then
 fi
 
 echo "VPS ready. The first release deploy starts the pixelyard service."
+echo "Admin key (keep it private): $(sed -n 's/^ADMIN_KEY=//p' /etc/pixelyard.env)"
