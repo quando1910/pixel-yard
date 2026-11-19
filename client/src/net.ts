@@ -30,9 +30,12 @@ export interface Net {
 }
 
 export async function connect(name: string, gender: number, isAdmin: boolean, onClosed: () => void): Promise<Net> {
-  const url = import.meta.env.DEV
-    ? `ws://${location.hostname}:${SERVER_PORT}`
-    : `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}`;
+  // VITE_SERVER_URL is set at build time when the client is hosted apart from the server (e.g. wss://api.example.com).
+  // Otherwise: the local dev server in development, the page's own host in production.
+  const url = (import.meta.env.VITE_SERVER_URL as string | undefined)
+    || (import.meta.env.DEV
+      ? `ws://${location.hostname}:${SERVER_PORT}`
+      : `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}`);
   const room = await new Client(url).joinOrCreate(ROOM_NAME, { name, gender, admin: isAdmin });
   const net: Net = {
     room,
